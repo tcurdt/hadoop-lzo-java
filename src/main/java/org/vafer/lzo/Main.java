@@ -10,10 +10,10 @@ import com.beust.jcommander.Parameter;
 
 public class Main {
 
-	@Parameter(description = "file1.lzo file2.lzo")
+	@Parameter(description = "file1.lzo file2.lzo ...")
 	private List<String> files = new ArrayList<String>();	 
 
-	@Parameter(names = "-verbose", description = "verbose output")
+	@Parameter(names = "-v", description = "verbose output")
 	public boolean debug = false;
 
 	private void run() throws Exception {
