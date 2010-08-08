@@ -23,9 +23,9 @@ You can either use the jar directly from the command line
 Or you can use the 'LzoIndexer' class directly
 
     LzoIndexer indexer = new LzoIndexer();
-		indexer.createIndex(
-		  new FileInputStream("file.lzo"),
-		  new FileOutputStream("file.lzo.index"));
+    indexer.createIndex(
+      new FileInputStream("file.lzo"),
+      new FileOutputStream("file.lzo.index"));
 
 ## How to build
 
