@@ -1,6 +1,6 @@
 # LZO index files without the hassle
 
-For LZO files to be splittable for Hadoop they require an accompanied index file. One project does this job is the [hadoop-lzo-packager](http://github.com/toddlipcon/hadoop-lzo-packager).
+For LZO files to be splittable for Hadoop they require an accompanied index file. One project does this job is the [hadoop-lzo](https://github.com/kevinweil/hadoop-lzo).
 Unfortunately it depends the native libraries via JNI. In other words - pain just around the corner. As creating the index merely needs more than seeking through the LZO file, there really is no reason for not doing this without all these dependencies.
 
 ## How to get it
