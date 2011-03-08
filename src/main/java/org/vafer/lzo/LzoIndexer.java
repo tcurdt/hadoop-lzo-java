@@ -10,7 +10,7 @@ import java.util.zip.DataFormatException;
 import org.apache.commons.io.input.CountingInputStream;
 
 public final class LzoIndexer {
-    
+
     private final static long F_ADLER32_D     = 0x00000001L;
     private final static long F_ADLER32_C     = 0x00000002L;
     private final static long F_CRC32_D       = 0x00000100L;
@@ -22,38 +22,38 @@ public final class LzoIndexer {
 
     public void createIndex(InputStream fis, OutputStream fos) throws IOException, DataFormatException {
         try {
-            
-            CountingInputStream cis = new CountingInputStream(fis);     
+
+            CountingInputStream cis = new CountingInputStream(fis);
             DataInputStream is = new DataInputStream(cis);
             DataOutputStream os = new DataOutputStream(fos);
-            
+
             byte m[] = new byte[magic.length];
 
             if (is.read(m) != m.length) {
-                throw new DataFormatException("failed to read header");         
+                throw new DataFormatException("failed to read header");
             }
-            
+
             for (int i = 0; i < m.length; i++) {
                 if (magic[i] != m[i]) {
-                    throw new DataFormatException("not a lzo file " + i);               
+                    throw new DataFormatException("not a lzo file " + i);
                 }
             }
 
             int version = is.readShort(); // version
-            
+
             if (version < 0x0900) {
-                throw new DataFormatException("cannot read version " + version);            
+                throw new DataFormatException("cannot read version " + version);
             }
-            
+
             is.readShort(); // lib version
-            
-            if (version >= 0x0940) { 
-                is.readShort(); // extract version          
+
+            if (version >= 0x0940) {
+                is.readShort(); // extract version
             }
 
             is.readByte(); // method
             if (version >= 0x0940) {
-                is.readByte(); // level         
+                is.readByte(); // level
             }
 
             int flags = is.readInt();
@@ -64,24 +64,24 @@ public final class LzoIndexer {
             int numCompressedChecksums = 0;
             if ((flags & F_ADLER32_C) != 0) numCompressedChecksums++;
             if ((flags & F_CRC32_C) != 0) numCompressedChecksums++;
-            
+
             int numDecompressedChecksums = 0;
             if ((flags & F_ADLER32_D) != 0) numDecompressedChecksums++;
             if ((flags & F_CRC32_D) != 0) numDecompressedChecksums++;
-                    
+
             is.readInt(); // mode
             is.readInt(); // mtime_low
             if (version >= 0x0940) {
-                is.readInt(); // mtime_high         
+                is.readInt(); // mtime_high
             }
-            
+
             int len = is.readUnsignedByte(); // name len
-            
+
             char[] name = new char[len];
             for(int i=0; i<len; i++) {
                 name[i] = (char)is.readByte();
             }
-            
+
             is.readInt(); // checksum
 
             if ((flags & F_H_EXTRA_FIELD) != 0) {
@@ -91,21 +91,21 @@ public final class LzoIndexer {
                 }
                 is.readInt(); // checksum
             }
-            
+
             while(true) {
                 long pos = cis.getByteCount();
-                
+
                 long uncompressed_blocksize = is.readInt();
                 if (uncompressed_blocksize == 0) {
                     break;
                 }
                 long compressed_blocksize = is.readInt();
-                
+
                 os.writeLong(pos);
-                
+
                 int numChecksumsToSkip = (uncompressed_blocksize == compressed_blocksize) ?
                         numDecompressedChecksums : numDecompressedChecksums + numCompressedChecksums;
-                            
+
                 long skip = compressed_blocksize + (4 * numChecksumsToSkip);
                 while(skip > 0) {
                     long s = is.skip(skip);
@@ -113,8 +113,8 @@ public final class LzoIndexer {
                         skip -= s;
                     }
                 }
-            }       
-            
+            }
+
         } finally {
             fis.close();
             fos.close();
